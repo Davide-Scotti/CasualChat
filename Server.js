@@ -1,5 +1,6 @@
-const express = require('express')
+const path = require('path')
 const http = require('http')
+const express = require('express')
 const socketIO = require('socket.io')
 const { v4:uuidv4 } = require('uuid')
 
@@ -10,13 +11,11 @@ const PORT = process.env.PORT || 3000;
 
 const chatRooms = {}
 
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
-  });
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/:room', (req, res) => {
-    res.sendFile(__dirname + '/index.html')
-})
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 io.on('connection', (socket) => {
     const privateChatQueue = []
@@ -60,7 +59,6 @@ io.on('connection', (socket) => {
       socket.join(room);
       chatRooms[room].push({ id: socket.id, username: `Utente${chatRooms[room].length + 1}` });
   
-      // Invia un messaggio di benvenuto agli altri utenti nella stanza
       socket.to(room).emit('message', `${socket.id} si è unito alla chat.`);
     });
   
@@ -75,7 +73,6 @@ io.on('connection', (socket) => {
         if (index !== -1) {
           const user = chatRooms[r][index];
           chatRooms[r].splice(index, 1);
-          // Invia un messaggio di uscita agli altri utenti nella stanza
           socket.to(r).emit('message', `${user.username} ha lasciato la chat.`);
         }
       }
@@ -83,5 +80,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-    console.log("Server in ascolto sulla porta ${PORT}")
-})
+  console.log(`Server in ascolto sulla porta ${PORT}`);
+});
