@@ -30,8 +30,8 @@ io.on('connection', (socket) => {
         const user2 = privateChatQueue.shift()
 
         const privateRoom = uuidv4()
-        socket.join(privateRoom
-            io.to.(user1.id).emit()
+        socket.join(privateRoom,
+            io.to(user1.id).emit())
        }
     }
 
